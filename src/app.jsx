@@ -34,9 +34,18 @@ function App() {
     setDisplayedCards(newDisplayed);
 };
 
- const resetDeck = () => {
+    const resetDeck = () => {
         setDeck([...deck, ...displayedCards]);
         setDisplayedCards([]);
+    };
+
+    const [pickedCardIndex, setPickedCardIndex] = React.useState(null);
+    const tossCard = () => {
+        if (pickedCardIndex === null) return; 
+        const newDisplayed = [...displayedCards];
+        newDisplayed.splice(pickedCardIndex, 1);
+        setDisplayedCards(newDisplayed);
+        setPickedCardIndex(null); // Reset picked card
     };
 
     return (
@@ -60,6 +69,7 @@ function App() {
                 <button onClick={() => dealCards(5)}>+ Deal 5</button>
                 <button onClick={() => dealCards(7)}>+ Deal 7</button>
                 <button onClick={resetDeck}>Reset</button>
+                <button onClick={tossCard}>Toss</button>
             </div>  
 
             <div className="card-container">
@@ -68,8 +78,8 @@ function App() {
                     key={index}
                     value={card.value}
                     suit={card.suit}
-                    isPicked={false}
-                    onClick={() => alert(`You picked ${card.value}${card.suit}`)}
+                    isPicked={pickedCardIndex === index}
+                    onClick={() => setPickedCardIndex(index)}
                 />
                 ))}
             </div>

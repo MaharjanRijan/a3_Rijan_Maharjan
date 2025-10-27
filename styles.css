@@ -48,8 +48,8 @@ h1 {
 }
 
 .picked {
-  border-color: blue;
-  box-shadow: 0 0 10px blue;
+  border-color: rgb(189, 108, 15);
+  box-shadow: 0 0 10px rgb(96, 18, 98);
 }
 
 .deck {
