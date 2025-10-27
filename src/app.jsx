@@ -13,8 +13,31 @@ function App() {
         return cards;
     });
 
-  const [displayedCards, setDisplayedCards] = React.useState([]);
+    const [displayedCards, setDisplayedCards] = React.useState([]);
 
+    const dealCards = (num) => {
+        if (deck.length === 0) return;
+
+    //Return displayed cards to the deck
+    const newDeck = [...deck, ...displayedCards];
+    const newDisplayed = [];
+
+    for (let i = 0; i < num; i++) {
+        if (newDeck.length === 0) break;
+
+        const randomIndex = Math.floor(Math.random() * newDeck.length);
+        newDisplayed.push(newDeck[randomIndex]);
+        newDeck.splice(randomIndex, 1);
+    }
+
+    setDeck(newDeck);
+    setDisplayedCards(newDisplayed);
+};
+
+ const resetDeck = () => {
+        setDeck([...deck, ...displayedCards]);
+        setDisplayedCards([]);
+    };
 
     return (
         <div>
@@ -36,6 +59,7 @@ function App() {
             <div className="buttons">
                 <button onClick={() => dealCards(5)}>+ Deal 5</button>
                 <button onClick={() => dealCards(7)}>+ Deal 7</button>
+                <button onClick={resetDeck}>Reset</button>
             </div>  
 
             <div className="card-container">
