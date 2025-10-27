@@ -69,3 +69,24 @@ h1 {
   user-select: none;
 }
 
+.buttons {
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}

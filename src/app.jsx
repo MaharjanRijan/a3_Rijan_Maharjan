@@ -32,6 +32,12 @@ function App() {
             >
                 {deck.length > 0 ? "Deck" : "No cards remaining"}
             </div>
+
+            <div className="buttons">
+                <button onClick={() => dealCards(5)}>+ Deal 5</button>
+                <button onClick={() => dealCards(7)}>+ Deal 7</button>
+            </div>  
+
             <div className="card-container">
                 {displayedCards.map((card, index) => (
                 <Card
