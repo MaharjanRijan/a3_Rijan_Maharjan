@@ -48,6 +48,19 @@ function App() {
         setPickedCardIndex(null); // Reset picked card
     };
 
+    const handleCardClick = (index) => {
+        if (pickedCardIndex === null) {
+            setPickedCardIndex(index);
+        } else if (pickedCardIndex === index) {
+            setPickedCardIndex(null);
+        } else {
+            const newDisplayed = [...displayedCards];
+            [newDisplayed[pickedCardIndex], newDisplayed[index]] = [newDisplayed[index], newDisplayed[pickedCardIndex]];
+            setDisplayedCards(newDisplayed);
+            setPickedCardIndex(null);
+        }   
+    };
+
     return (
         <div>
             <h1>Card Game</h1>
@@ -79,7 +92,7 @@ function App() {
                     value={card.value}
                     suit={card.suit}
                     isPicked={pickedCardIndex === index}
-                    onClick={() => setPickedCardIndex(index)}
+                    onClick={() => handleCardClick(index)}
                 />
                 ))}
             </div>
