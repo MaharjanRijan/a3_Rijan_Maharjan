@@ -61,6 +61,22 @@ function App() {
         }   
     };
 
+    const addWildCard = () => {
+        const randomSuit = suits[Math.floor(Math.random() * suits.length)];
+        const randomValue = values[Math.floor(Math.random() * values.length)];
+        setDisplayedCards([...displayedCards, { suit: randomSuit, value: randomValue }]);
+    };
+
+    const regroupCards = () => {
+        const shuffled = [...displayedCards];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        setDisplayedCards(shuffled);
+        setPickedCardIndex(null);
+    };
+
     return (
         <div>
             <h1>Card Game</h1>
@@ -83,6 +99,8 @@ function App() {
                 <button onClick={() => dealCards(7)}>+ Deal 7</button>
                 <button onClick={resetDeck}>Reset</button>
                 <button onClick={tossCard}>Toss</button>
+                <button onClick={addWildCard}>+ Wild Card</button>
+                <button onClick={regroupCards}>Regroup</button>
             </div>  
 
             <div className="card-container">
