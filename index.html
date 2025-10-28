@@ -84,24 +84,30 @@ function Deck({ deckLength, onDeckClick }) {
 function Controls({ onDeal5, onDeal7, onReset, onToss, onAddWildCard, onRegroup }) {
   return (
       <div className="buttons">
-          {/* Deal 5 cards button - returns current cards to deck and deals 5 new ones */}
+          {/* Deal 5 - returns current cards to deck and deals 5 new ones */}
           <button className="blue" onClick={onDeal5}>+ Deal 5</button>
-          {/* Deal 7 cards button - returns current cards to deck and deals 7 new ones */}
-            <button className="blue" onClick={onDeal7}>+ Deal 7</button>
-            {/* Reset button - puts all cards back in deck */}
-            <button className="grey" onClick={onReset}>Reset</button>
-            {/* Toss button - permanently deletes the picked card */}
-            <button className="red" onClick={onToss}>Toss</button>
-            {/* Wild Card button - adds a random new card */}
-            <button className="green" onClick={onAddWildCard}>+ Wild Card</button>
-            {/* Regroup button - shuffles the current displayed cards */}
-            <button className="yellow" onClick={onRegroup}>Regroup</button>
-        </div>
-    );
+          {/* Deal 7 - returns current cards to deck and deals 7 new ones */}
+          <button className="blue" onClick={onDeal7}>+ Deal 7</button>
+          {/* Reset - puts all cards back in deck */}
+          <button className="grey" onClick={onReset}>Reset</button>
+          {/* Toss - permanently deletes the picked card */}
+          <button className="red" onClick={onToss}>Toss</button>
+          {/* Wild Card - adds a random new card */}
+          <button className="green" onClick={onAddWildCard}>+ Wild Card</button>
+          {/* Regroup - shuffles the current displayed cards */}
+          <button className="yellow" onClick={onRegroup}>Regroup</button>
+      </div>
+  );
 }
 
 // HAND COMPONENT - Displays all the dealt cards or "no cards" message
-// Props: cards (array of card objects), pickedCardIndex (which card is selected), onCardClick (function for card clicks)
+
+/* Props: 
+  cards (array of card objects), 
+  pickedCardIndex (which card is selected), 
+  onCardClick (function for card clicks) 
+*/
+
 function Hand({ cards, pickedCardIndex, onCardClick }) {
     return (
         <div className="card-area">
@@ -180,7 +186,7 @@ function App() {
         setPickedCardIndex(null); // Clear any picked card
     };
 
-    // FUNCTION: Toss (permanently delete) the currently picked card
+    // FUNCTION: Toss the currently picked card
     const tossCard = () => {
         if (pickedCardIndex === null) return; // Do nothing if no card is picked
         const newDisplayed = [...displayedCards];
@@ -192,21 +198,21 @@ function App() {
     // FUNCTION: Handle when a displayed card is clicked
     const handleCardClick = (index) => {
         if (pickedCardIndex === null) {
-            // If no card is picked, pick this card
+            // If no card is picked, picks the selected card
             setPickedCardIndex(index);
         } else if (pickedCardIndex === index) {
-            // If clicking the same card that's already picked, unpick it
+            // If clicking the same card that's already picked, unpicks it
             setPickedCardIndex(null);
         } else {
             // If clicking a different card while one is picked, swap their positions
             const newDisplayed = [...displayedCards];
             [newDisplayed[pickedCardIndex], newDisplayed[index]] = [newDisplayed[index], newDisplayed[pickedCardIndex]];
             setDisplayedCards(newDisplayed);
-            setPickedCardIndex(null); // Clear picked state after swapping
+            setPickedCardIndex(null); // Clears picked state after swapping
         }   
     };
 
-    // FUNCTION: Add a wild card (random suit and value) to the display
+    // FUNCTION: Adds a wild card with random suit and value to the display
     const addWildCard = () => {
         // Pick a random suit and random value
         const randomSuit = suits[Math.floor(Math.random() * suits.length)];
@@ -215,10 +221,10 @@ function App() {
         setDisplayedCards([...displayedCards, { suit: randomSuit, value: randomValue }]);
     };
 
-    // FUNCTION: Regroup (shuffle) the currently displayed cards
+    // FUNCTION: Regroup the currently displayed cards
     const regroupCards = () => {
         const shuffled = [...displayedCards];
-        // Fisher-Yates shuffle algorithm to randomly rearrange cards
+        // suffles cards
         for (let i = shuffled.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap cards
@@ -227,19 +233,19 @@ function App() {
         setPickedCardIndex(null); // Clear any picked card after shuffling
     };
 
-    // FUNCTION: Handle clicking the deck to draw a single card
+    // FUNCTION: Handles clicking the deck to draw a single card
     const handleDeckClick = () => {
         if (deck.length === 0) return; // Do nothing if deck is empty
-        // Pick a random card from the deck
+        // Picks a random card from the deck
         const randomIndex = Math.floor(Math.random() * deck.length);
         const drawnCard = deck[randomIndex];
-        // Add the drawn card to displayed cards
+        // Adds the drawn card to displayed cards
         setDisplayedCards([...displayedCards, drawnCard]);
-        // Remove the drawn card from the deck
+        // Removes the drawn card from the deck
         setDeck(deck.filter((_, i) => i !== randomIndex));
     };
 
-    // RENDER: What gets displayed on the webpage
+    // Component's that gets displayed on the webpage
     return (
         <div>
             <h1>Card Game</h1>
@@ -251,7 +257,7 @@ function App() {
                 onDeckClick={handleDeckClick}
             />
 
-            {/* Controls component - all the game buttons */}
+            {/* Controls component - Displays all the game buttons */}
             <Controls 
                 onDeal5={() => dealCards(5)}
                 onDeal7={() => dealCards(7)}
@@ -261,7 +267,7 @@ function App() {
                 onRegroup={regroupCards}
             />
 
-            {/* Hand component - displays all the dealt cards */}
+            {/* Hand component - Displays all the dealt cards */}
             <Hand 
                 cards={displayedCards}
                 pickedCardIndex={pickedCardIndex}
@@ -271,8 +277,7 @@ function App() {
     );
 }
 
-// START THE APP: Create a React root and render our App component
-// This finds the div with id="root" and puts our entire React app inside it
+// Create a React root and render our App component
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 </script>
