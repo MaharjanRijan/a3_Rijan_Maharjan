@@ -1,3 +1,5 @@
+// StAuth10244: I, Rijan Maharjan, 000923274 certify that this material is my original work. No other person's work has been used without due acknowledgement. I have not made my work available to anyone else.
+
 function App() {
 
    const suits = ['♠', '♥', '♦', '♣'];
@@ -14,32 +16,30 @@ function App() {
     });
 
     const [displayedCards, setDisplayedCards] = React.useState([]);
+    const [pickedCardIndex, setPickedCardIndex] = React.useState(null);
 
     const dealCards = (num) => {
         if (deck.length === 0) return;
+        const newDeck = [...deck, ...displayedCards];
+        const newDisplayed = [];
 
-    //Return displayed cards to the deck
-    const newDeck = [...deck, ...displayedCards];
-    const newDisplayed = [];
+        for (let i = 0; i < num; i++) {
+            if (newDeck.length === 0) break;
+            const randomIndex = Math.floor(Math.random() * newDeck.length);
+            newDisplayed.push(newDeck[randomIndex]);
+            newDeck.splice(randomIndex, 1);
+        }
 
-    for (let i = 0; i < num; i++) {
-        if (newDeck.length === 0) break;
-
-        const randomIndex = Math.floor(Math.random() * newDeck.length);
-        newDisplayed.push(newDeck[randomIndex]);
-        newDeck.splice(randomIndex, 1);
-    }
-
-    setDeck(newDeck);
-    setDisplayedCards(newDisplayed);
-};
+        setDeck(newDeck);
+        setDisplayedCards(newDisplayed);
+    };
 
     const resetDeck = () => {
         setDeck([...deck, ...displayedCards]);
         setDisplayedCards([]);
     };
 
-    const [pickedCardIndex, setPickedCardIndex] = React.useState(null);
+    
     const tossCard = () => {
         if (pickedCardIndex === null) return; 
         const newDisplayed = [...displayedCards];
@@ -92,28 +92,38 @@ function App() {
                 }}
             >
                 {deck.length > 0 ? "Deck" : "No cards remaining"}
-            </div>
+                </div>
 
-            <div className="buttons">
-                <button onClick={() => dealCards(5)}>+ Deal 5</button>
-                <button onClick={() => dealCards(7)}>+ Deal 7</button>
-                <button onClick={resetDeck}>Reset</button>
-                <button onClick={tossCard}>Toss</button>
-                <button onClick={addWildCard}>+ Wild Card</button>
-                <button onClick={regroupCards}>Regroup</button>
-            </div>  
+                <div className="buttons">
+                    <button onClick={() => dealCards(5)}>+ Deal 5</button>
+                    <button onClick={() => dealCards(7)}>+ Deal 7</button>
+                    <button onClick={resetDeck}>Reset</button>
+                    <button onClick={tossCard}>Toss</button>
+                    <button onClick={addWildCard}>+ Wild Card</button>
+                    <button onClick={regroupCards}>Regroup</button>
+                </div>
 
-            <div className="card-container">
+            <div className="card-area">
+            {displayedCards.length > 0 ? (
+                <div className="card-container">
                 {displayedCards.map((card, index) => (
-                <Card
+                    <Card
                     key={index}
                     value={card.value}
                     suit={card.suit}
                     isPicked={pickedCardIndex === index}
                     onClick={() => handleCardClick(index)}
-                />
+                    />
                 ))}
+                </div>
+                ) : (
+                    <div className="no-cards">
+                    No cards dealt yet!
+                    </div>
+                )}
             </div>
+
+
         </div>
     )
 }
