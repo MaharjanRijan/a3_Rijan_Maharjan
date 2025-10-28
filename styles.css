@@ -1,3 +1,4 @@
+/* StAuth10244: I, Rijan Maharjan, 000923274 certify that this material is my original work. No other person's work has been used without due acknowledgement. I have not made my work available to anyone else. */
 body {
   font-family: Arial, sans-serif;
   margin: 20px;
@@ -65,17 +66,23 @@ p{
   margin: 20px auto;
   width: 140px;
   height: 90px;
-  background-color: #333;
+  background: repeating-linear-gradient(
+    180deg,
+    #ab1717 0px,
+    #3c043c 5px,
+    #200721 15px,
+    #3c043c 20px
+  );
+  border-radius: 12px;
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 12px;
   font-weight: 600;
-  transition: all 0.2s ease;
   font-size: 16px;
   cursor: pointer;
   user-select: none;
+  position: relative;
 }
 
 .buttons {
@@ -91,9 +98,49 @@ button {
   cursor: pointer;
   border-radius: 6px;
   border: none;
-  background-color: #007bff;
   color: white;
   transition: background 0.2s;
+}
+
+button.blue {
+  background-color: #007bff;
+}
+
+button.blue:hover {
+  background-color: #0056b3;
+}
+
+button.red {
+  background-color: #c91f30;
+}
+
+button.red:hover {
+  background-color: #ff0019;
+}
+
+button.green {
+  background-color: #1e8035;
+}
+
+button.green:hover {
+  background-color: #1c7430;
+}
+
+button.yellow {
+  background-color: #ffb700;
+  color: #000000;
+}
+
+button.yellow:hover {
+  background-color: #f59300;
+}
+
+button.grey {
+  background-color: #596067;
+}
+
+button.grey:hover {
+  background-color: #33383c;
 }
 
 button:hover {
@@ -126,4 +173,9 @@ button:hover {
   color: #ffffff;
   font-style: italic;
   margin-top: 20px;
+}
+
+.deck-count {
+    font-size: 12px;
+    color: #ccc;
 }

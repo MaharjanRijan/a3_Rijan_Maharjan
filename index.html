@@ -1,21 +1,280 @@
+<!--StAuth10244: I, Rijan Maharjan, 000923274 certify that this material is my original work. No other person's work has been used without due acknowledgement. I have not made my work available to anyone else.-->
 <!doctype html>
 <html>
 <head>
   <meta charset="utf-8"/>
   <title>Deck Manipulator</title>
+  <!-- Link to external CSS file-->
   <link rel="stylesheet" href="styles.css">
-  <!-- React & ReactDOM -->
+  
+  <!-- Load React library -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <!-- Load ReactDOM library -->
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <!-- Babel for in-browser JSX transpile -->
+  <!-- Load Babel transpiler - this converts JSX code to regular JavaScript that browsers understand -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
+  <!-- rendering React app -->
   <div id="root"></div>
 
-<!-- link to Card.jsx -->
-<script type="text/babel" src="src/components/Card.jsx"></script>
-<!-- link to app.jsx -->
-  <script type="text/babel" src="src/app.jsx"></script>
+<!-- ALL REACT COMPONENTS AND APP LOGIC -->
+<script type="text/babel">
+// StAuth10244: I, Rijan Maharjan, 000923274 certify that this material is my original work. No other person's work has been used without due acknowledgement. I have not made my work available to anyone else.
+
+// CARD COMPONENT - Displays a single playing card
+
+/*Props: 
+  value (A,2,3...K), 
+  suit (♠♥♦♣), 
+  isPicked (true/false for highlighting), 
+  onClick (function to run when clicked)
+*/
+
+function Card({ value, suit, isPicked, onClick }) {
+    // Determine if card should be red or black based on suit
+    const isRed = suit === '♥' || suit === '♦'; 
+    const cardColor = isRed ? 'red' : 'black';
+
+    return (
+        <div className={`card ${isPicked ? 'picked' : ''}`} onClick={onClick}>
+            {/* Display the card's value with correct color */}
+            <div className="card-value" style={{ color: cardColor }}>{value}</div>
+            {/* Display the card's suit symbol with correct color */}
+            <div className="card-suit" style={{ color: cardColor }}>{suit}</div>
+        </div>
+    );
+}
+
+// DECK COMPONENT - Shows the deck to click and how many cards are left
+
+/*Props: 
+  deckLength (number of cards remaining),
+  onDeckClick (function to run when deck is clicked)
+*/
+
+function Deck({ deckLength, onDeckClick }) {
+    return (
+        <div>
+            {/* The main deck area that users click to draw cards */}
+            <div 
+                className="deck"
+                onClick={onDeckClick}
+            >
+                {/* Show "Deck" if cards remain, otherwise "No cards remaining" */}
+                {deckLength > 0 ? "Deck" : "No cards remaining"}
+            </div>
+            {/* Display how many cards are left in the deck */}
+            <div className="deck-count">{deckLength} cards left</div>
+        </div>
+    );
+}
+
+// CONTROLS COMPONENT - All the game control buttons
+
+/* Props: 
+  onDeal5, 
+  onDeal7,
+  onReset, 
+  onToss, 
+  onAddWildCard, 
+  onRegroup (all functions for button clicks) 
+*/
+
+function Controls({ onDeal5, onDeal7, onReset, onToss, onAddWildCard, onRegroup }) {
+  return (
+      <div className="buttons">
+          {/* Deal 5 cards button - returns current cards to deck and deals 5 new ones */}
+          <button className="blue" onClick={onDeal5}>+ Deal 5</button>
+          {/* Deal 7 cards button - returns current cards to deck and deals 7 new ones */}
+            <button className="blue" onClick={onDeal7}>+ Deal 7</button>
+            {/* Reset button - puts all cards back in deck */}
+            <button className="grey" onClick={onReset}>Reset</button>
+            {/* Toss button - permanently deletes the picked card */}
+            <button className="red" onClick={onToss}>Toss</button>
+            {/* Wild Card button - adds a random new card */}
+            <button className="green" onClick={onAddWildCard}>+ Wild Card</button>
+            {/* Regroup button - shuffles the current displayed cards */}
+            <button className="yellow" onClick={onRegroup}>Regroup</button>
+        </div>
+    );
+}
+
+// HAND COMPONENT - Displays all the dealt cards or "no cards" message
+// Props: cards (array of card objects), pickedCardIndex (which card is selected), onCardClick (function for card clicks)
+function Hand({ cards, pickedCardIndex, onCardClick }) {
+    return (
+        <div className="card-area">
+            {/* If there are cards to show, display them. Otherwise show "no cards" message */}
+            {cards.length > 0 ? (
+                <div className="card-container">
+                    {/* Loop through each card and create a Card component for it */}
+                    {cards.map((card, index) => (
+                        <Card
+                            key={index}
+                            value={card.value}
+                            suit={card.suit}
+                            isPicked={pickedCardIndex === index}
+                            onClick={() => onCardClick(index)}
+                        />
+                    ))}
+                </div>
+            ) : (
+                // Message shown when no cards have been dealt yet
+                <div className="no-cards">
+                    No cards dealt yet!
+                </div>
+            )}
+        </div>
+    );
+}
+
+// MAIN APP COMPONENT - Controls all the game logic and state
+function App() {
+    // All possible card suits and values for a standard deck
+    const suits = ['♠', '♥', '♦', '♣'];
+    const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+    // STATE: The deck of cards (starts with all 52 cards)
+    const [deck, setDeck] = React.useState(() => {
+        const cards = [];
+        // Create all 52 cards by combining each suit with each value
+        for (let suit of suits) {
+            for (let value of values) {
+                cards.push({ suit, value });
+            }
+        }
+        return cards;
+    });
+
+    // STATE: Cards currently displayed on screen (starts empty)
+    const [displayedCards, setDisplayedCards] = React.useState([]);
+    // STATE: Which card is currently picked/selected (null means none selected)
+    const [pickedCardIndex, setPickedCardIndex] = React.useState(null);
+
+    // FUNCTION: Deal a specific number of cards (used by Deal 5 and Deal 7 buttons)
+    const dealCards = (num) => {
+        if (deck.length === 0) return; // Don't do anything if deck is empty
+        
+        // First, put all current displayed cards back into the deck
+        const newDeck = [...deck, ...displayedCards];
+        const newDisplayed = [];
+
+        // Then draw the requested number of random cards
+        for (let i = 0; i < num; i++) {
+            if (newDeck.length === 0) break; // Stop if we run out of cards
+            const randomIndex = Math.floor(Math.random() * newDeck.length);
+            newDisplayed.push(newDeck[randomIndex]); // Add card to display
+            newDeck.splice(randomIndex, 1); // Remove card from deck
+        }
+
+        // Update the state with new deck and displayed cards
+        setDeck(newDeck);
+        setDisplayedCards(newDisplayed);
+    };
+
+    // FUNCTION: Reset game - put all cards back in deck and clear display
+    const resetDeck = () => {
+        setDeck([...deck, ...displayedCards]); // Put all cards back in deck
+        setDisplayedCards([]); // Clear the display
+        setPickedCardIndex(null); // Clear any picked card
+    };
+
+    // FUNCTION: Toss (permanently delete) the currently picked card
+    const tossCard = () => {
+        if (pickedCardIndex === null) return; // Do nothing if no card is picked
+        const newDisplayed = [...displayedCards];
+        newDisplayed.splice(pickedCardIndex, 1); // Remove the picked card permanently
+        setDisplayedCards(newDisplayed);
+        setPickedCardIndex(null); // Clear the picked state
+    };
+
+    // FUNCTION: Handle when a displayed card is clicked
+    const handleCardClick = (index) => {
+        if (pickedCardIndex === null) {
+            // If no card is picked, pick this card
+            setPickedCardIndex(index);
+        } else if (pickedCardIndex === index) {
+            // If clicking the same card that's already picked, unpick it
+            setPickedCardIndex(null);
+        } else {
+            // If clicking a different card while one is picked, swap their positions
+            const newDisplayed = [...displayedCards];
+            [newDisplayed[pickedCardIndex], newDisplayed[index]] = [newDisplayed[index], newDisplayed[pickedCardIndex]];
+            setDisplayedCards(newDisplayed);
+            setPickedCardIndex(null); // Clear picked state after swapping
+        }   
+    };
+
+    // FUNCTION: Add a wild card (random suit and value) to the display
+    const addWildCard = () => {
+        // Pick a random suit and random value
+        const randomSuit = suits[Math.floor(Math.random() * suits.length)];
+        const randomValue = values[Math.floor(Math.random() * values.length)];
+        // Add this new card to the displayed cards
+        setDisplayedCards([...displayedCards, { suit: randomSuit, value: randomValue }]);
+    };
+
+    // FUNCTION: Regroup (shuffle) the currently displayed cards
+    const regroupCards = () => {
+        const shuffled = [...displayedCards];
+        // Fisher-Yates shuffle algorithm to randomly rearrange cards
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap cards
+        }
+        setDisplayedCards(shuffled);
+        setPickedCardIndex(null); // Clear any picked card after shuffling
+    };
+
+    // FUNCTION: Handle clicking the deck to draw a single card
+    const handleDeckClick = () => {
+        if (deck.length === 0) return; // Do nothing if deck is empty
+        // Pick a random card from the deck
+        const randomIndex = Math.floor(Math.random() * deck.length);
+        const drawnCard = deck[randomIndex];
+        // Add the drawn card to displayed cards
+        setDisplayedCards([...displayedCards, drawnCard]);
+        // Remove the drawn card from the deck
+        setDeck(deck.filter((_, i) => i !== randomIndex));
+    };
+
+    // RENDER: What gets displayed on the webpage
+    return (
+        <div>
+            <h1>Card Game</h1>
+            <p>Welcome to the card game!</p>
+            
+            {/* Deck component - shows deck and card count */}
+            <Deck 
+                deckLength={deck.length}
+                onDeckClick={handleDeckClick}
+            />
+
+            {/* Controls component - all the game buttons */}
+            <Controls 
+                onDeal5={() => dealCards(5)}
+                onDeal7={() => dealCards(7)}
+                onReset={resetDeck}
+                onToss={tossCard}
+                onAddWildCard={addWildCard}
+                onRegroup={regroupCards}
+            />
+
+            {/* Hand component - displays all the dealt cards */}
+            <Hand 
+                cards={displayedCards}
+                pickedCardIndex={pickedCardIndex}
+                onCardClick={handleCardClick}
+            />
+        </div>
+    );
+}
+
+// START THE APP: Create a React root and render our App component
+// This finds the div with id="root" and puts our entire React app inside it
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
 </body>
 </html>
