@@ -24,13 +24,6 @@
 
 // CARD COMPONENT - Displays a single playing card
 
-/*Props: 
-  value (A,2,3...K), 
-  suit (♠♥♦♣), 
-  isPicked (true/false for highlighting), 
-  onClick (function to run when clicked)
-*/
-
 function Card({ value, suit, isPicked, onClick }) {
     // Determine if card should be red or black based on suit
     const isRed = suit === '♥' || suit === '♦'; 
@@ -47,11 +40,6 @@ function Card({ value, suit, isPicked, onClick }) {
 }
 
 // DECK COMPONENT - Shows the deck to click and how many cards are left
-
-/*Props: 
-  deckLength (number of cards remaining),
-  onDeckClick (function to run when deck is clicked)
-*/
 
 function Deck({ deckLength, onDeckClick }) {
     return (
@@ -71,15 +59,6 @@ function Deck({ deckLength, onDeckClick }) {
 }
 
 // CONTROLS COMPONENT - All the game control buttons
-
-/* Props: 
-  onDeal5, 
-  onDeal7,
-  onReset, 
-  onToss, 
-  onAddWildCard, 
-  onRegroup (all functions for button clicks) 
-*/
 
 function Controls({ onDeal5, onDeal7, onReset, onToss, onAddWildCard, onRegroup }) {
   return (
@@ -101,12 +80,6 @@ function Controls({ onDeal5, onDeal7, onReset, onToss, onAddWildCard, onRegroup 
 }
 
 // HAND COMPONENT - Displays all the dealt cards or "no cards" message
-
-/* Props: 
-  cards (array of card objects), 
-  pickedCardIndex (which card is selected), 
-  onCardClick (function for card clicks) 
-*/
 
 function Hand({ cards, pickedCardIndex, onCardClick }) {
     return (
@@ -160,23 +133,26 @@ function App() {
 
     // FUNCTION: Deal a specific number of cards (used by Deal 5 and Deal 7 buttons)
     const dealCards = (num) => {
-        if (deck.length === 0) return; // Don't do anything if deck is empty
+        if (deck.length < num) {
+            // If not enough cards in deck, deal whatever is available
+            if (deck.length === 0) return; // Don't do anything if deck is completely empty
+        }
         
-        // First, put all current displayed cards back into the deck
-        const newDeck = [...deck, ...displayedCards];
         const newDisplayed = [];
+        const remainingDeck = [...deck]; // Work with a copy of the current deck
 
-        // Then draw the requested number of random cards
-        for (let i = 0; i < num; i++) {
-            if (newDeck.length === 0) break; // Stop if we run out of cards
-            const randomIndex = Math.floor(Math.random() * newDeck.length);
-            newDisplayed.push(newDeck[randomIndex]); // Add card to display
-            newDeck.splice(randomIndex, 1); // Remove card from deck
+        // Draw the requested number of random cards from the deck
+        for (let i = 0; i < num && remainingDeck.length > 0; i++) {
+            const randomIndex = Math.floor(Math.random() * remainingDeck.length);
+            newDisplayed.push(remainingDeck[randomIndex]); // Add card to display
+            remainingDeck.splice(randomIndex, 1); // Remove card from deck
         }
 
         // Update the state with new deck and displayed cards
-        setDeck(newDeck);
+        // Note: Previously displayed cards are discarded, not returned to deck
+        setDeck(remainingDeck);
         setDisplayedCards(newDisplayed);
+        setPickedCardIndex(null); // Clear any picked card
     };
 
     // FUNCTION: Reset game - put all cards back in deck and clear display
